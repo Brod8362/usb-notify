@@ -45,36 +45,34 @@ int display_notification(struct udev_device *dev)
         {
             /* Check if action is bind */
             const char *action = udev_device_get_action(dev);
-            if (!strcmp(action, "add"))
-            {
-                const char *product = udev_device_get_sysattr_value(dev,
-                                                                    "product");
-                const char *vid = udev_device_get_sysattr_value(dev, "idVendor");
-                const char *pid = udev_device_get_sysattr_value(dev, "idProduct");
-                const char *serial = udev_device_get_sysattr_value(dev, "serial");
+	    //only display add & remove events
+	    if (strcmp(action, "add") && strcmp(action, "remove")) {
+		    //ignoring
+		    return 1;
+	    }
+	    char header_buffer[100];
+	    snprintf(header_buffer, 100, "usb device [%s]", action);
+            const char *product = udev_device_get_sysattr_value(dev, "product");
+            const char *vid = udev_device_get_sysattr_value(dev, "idVendor");
+            const char *pid = udev_device_get_sysattr_value(dev, "idProduct");
+            const char *serial = udev_device_get_sysattr_value(dev, "serial");
 
-                char *message;
-                if (0 > asprintf(&message,
-                                 "Product : %s\n"
-                                 "Serial #: %s\n"
-                                 "Vid-Pid: %s-%s",
-                                 product, serial, vid, pid))
-                {
-                    printf("[!] Error allocating char\n");
-                }
-                printf("[#] Displaying message: \n%s\n", message);
-
-                /* Display notification */
-                NotifyNotification *n_usb = notify_notification_new(
-                        "usb-notify", message, "dialog-information");
-                notify_notification_show(n_usb, NULL);
-                g_object_unref(G_OBJECT(n_usb));
-            }
-            else
+            char *message;
+            if (0 > asprintf(&message,
+                             "Product : %s\n"
+                             "Serial #: %s\n"
+                             "Vid-Pid: %s-%s",
+                             product, serial, vid, pid))
             {
-                return 1;
+                printf("[!] Error allocating char\n");
             }
-        }
+            printf("[#] Displaying message: \n%s\n", message);
+
+            /* Display notification */
+            NotifyNotification *n_usb = notify_notification_new(header_buffer, message, "dialog-information");
+            notify_notification_show(n_usb, NULL);
+            g_object_unref(G_OBJECT(n_usb));
+       }
     }
     udev_device_unref(dev);
     return 0;
