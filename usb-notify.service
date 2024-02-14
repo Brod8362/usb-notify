@@ -1,0 +1,8 @@
+[Unit]
+Description=USB notify service
+
+[Service]
+ExecStart=/usr/bin/usb-notify
+
+[Install]
+WantedBy=graphical.target

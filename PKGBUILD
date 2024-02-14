@@ -36,4 +36,5 @@ build() {
 package() {
     cd "$srcdir/$pkgname"
     install -Dm0755 -t "$pkgdir/usr/bin/" "bin/usb-notify"
+    install -Dm0644 -t "$pkgdir/usr/lib/systemd/user" "usb-notify.service"
 }
